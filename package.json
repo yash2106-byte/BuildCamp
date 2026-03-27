@@ -1,0 +1,20 @@
+{
+  "name": "project-management",
+  "version": "1.0.0",
+  "description": "a Project management for my projects",
+  "homepage": "https://github.com/yash2106-byte/BuildCamp#readme",
+  "bugs": {
+    "url": "https://github.com/yash2106-byte/BuildCamp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yash2106-byte/BuildCamp.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
