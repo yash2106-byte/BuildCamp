@@ -1,4 +1,4 @@
-// this is the place from where our we'll keep all the important variables so that we dont do any typos
+// this is the place from where we'll keep all the important variables so that we dont do any typos
 
 export const UserRolesEnum = {
     ADMIN: "admin",
