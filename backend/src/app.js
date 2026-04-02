@@ -17,6 +17,15 @@ web.use(cors({
 )
 
 
+
+// import router form the routes folders
+import  healthcheckrouter  from './routes/healthcheck-routes.js'
+
+web.use('/api/v1/healthcheck',healthcheckrouter)
+
+
+
+
 web.get('/',(req,res)=>{
     res.send("this is the home page")
 })
