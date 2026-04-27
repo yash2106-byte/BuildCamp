@@ -24,11 +24,11 @@ const GenerateAllTokens = async (userId) =>{
 const RegisterUser = asyncHandler(async (req,res)=>{
     const {email,username,password,role} = req.body
     // Check database for this user
-    const existedUser = User.findOne({
+    const existedUser =await User.findOne({
         $or: [{username},{email}]
     })
     if(existedUser){
-        throw new ApiError(402,"User with the same email or username already exists",[])
+        throw new ApiError(402,"User with the same email or username already exists")
     }
 
     // Create new user in the database

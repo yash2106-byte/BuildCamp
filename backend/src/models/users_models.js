@@ -1,17 +1,17 @@
 import mongoose, { Schema } from "mongoose"
-import brcypt from "brcypt"
+import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken"
-import cryto from "crypto"
+import crypto from "crypto"  
 
 const userSchema = new Schema({
     avatar:{
-        types:{
-            url:String,
-            localPath: String,
+        url:{                                           
+            type: String,
+            default: "https://placehold.co/600x400"
         },
-        default:{
-            url: `https://placehold.co/600x400`,
-            localPath: ""
+        localPath:{
+            type: String,
+            default: ""
         }
     },
     username:{
@@ -61,20 +61,18 @@ const userSchema = new Schema({
         timestamps: true,
     },
 );
-// these are the hooks for the user schema 
-userSchema.pre("save",async function(next){
+
+userSchema.pre("save", async function(){
     if (!this.isModified("password"))
-        return next()
-    this.password = await brcypt.hash(this.password,10)
-    next()
+        return
+    this.password = await bcrypt.hash(this.password, 10)
 })
-userSchema.method.isPasswordCorrect = async function (password) {
-    return await brcypt.compare(password,this.password)    
+
+userSchema.methods.isPasswordCorrect = async function(password){  
+    return await bcrypt.compare(password, this.password)    
 };
 
-// we are generating Access tokens below ,for every user request this function we be called
-userSchema.method.GenerateAcces = function(){
-    // this will be the payload which will be returned 
+userSchema.methods.GenerateAcces = function(){                     
     return jwt.sign({
         _id: this._id,
         email: this.email,
@@ -83,9 +81,8 @@ userSchema.method.GenerateAcces = function(){
         {expiresIn: process.env.ACCESS_TOKEN_EXPIRY}
     )
 }
-// THIS IS GENREATING THE REFRESH TOKEN
-userSchema.method.GenerateRefresh = function(){
-    // this will be the payload which will be returned 
+
+userSchema.methods.GenerateRefresh = function(){                  
     return jwt.sign({
         _id: this._id,
         },
@@ -93,15 +90,12 @@ userSchema.method.GenerateRefresh = function(){
         {expiresIn: process.env.REFRESH_TOKEN_EXPIRY}
     )
 }
-// genrating a hashed string  
-userSchema.method.GenerateTemp = function(){
-    const unhashed = cryto.randomBytes(20).toString("hex")
-    const hashed = cryto.createHash("sha256").update(unhashed).digest("hex")
-    const tokenExpiry = Date.now() + (20*60*100)
-    return {unhashed,hashed,tokenExpiry}
+
+userSchema.methods.GenerateTemp = function(){                      
+    const unhashed = crypto.randomBytes(20).toString("hex")        
+    const hashed = crypto.createHash("sha256").update(unhashed).digest("hex")
+    const tokenExpiry = Date.now() + (20*60*1000)
+    return {unhashed, hashed, tokenExpiry}
 }
 
-export const User = mongoose.model("User",userSchema)
-
-
- 
+export const User = mongoose.model("User", userSchema)
