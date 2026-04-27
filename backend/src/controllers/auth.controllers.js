@@ -2,7 +2,7 @@ import {User} from "../models/users_models.js"
 import {ApiResponse} from "../utils/api-response.js"
 import {asyncHandler} from "../utils/async-handler.js"
 import {ApiError} from "../utils/api-error.js"
-import {emailVerficationMailgenContent, sendEmail} from "../utils/mail.js"
+import { emailVerificationMailgenContent, sendEmail } from "../utils/mail.js"
 
 // the first thing we'll need is token, hence we are genrating it first
 const GenerateAllTokens = async (userId) =>{
