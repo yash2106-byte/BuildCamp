@@ -55,7 +55,7 @@ const RegisterUser = asyncHandler(async (req,res)=>{
     await sendEmail({
         email:Newuser?.email,
         subject: "Plese verfiy your email",
-        mailgenContent: emailVerficationMailgenContent(
+        mailgenContent: emailVerificationMailgenContent(
             Newuser.username,
             // this is the link which will be passed 
             `${req.protocol}://${req.get("host")}//api/v1/users/verify-email/${unhashed}`
