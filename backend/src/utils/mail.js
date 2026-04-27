@@ -12,7 +12,7 @@ const sendEmail = async (options)=>{
         theme: "default",
         product: {
             name: "Task Manager",
-            link: ""
+            link: "https://your-app-link.com"
         }
     })
     

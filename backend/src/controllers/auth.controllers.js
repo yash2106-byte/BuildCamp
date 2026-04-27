@@ -24,11 +24,18 @@ const GenerateAllTokens = async (userId) =>{
 const RegisterUser = asyncHandler(async (req,res)=>{
     const {email,username,password,role} = req.body
     // Check database for this user
+    // check email and username separtely because that is generating confusion
     const existedUser =await User.findOne({
         $or: [{username},{email}]
     })
     if(existedUser){
-        throw new ApiError(402,"User with the same email or username already exists")
+        throw new ApiError(402,"User with the same email already exists")
+    }
+    const existedUsername = await User.findOne({
+        $or: [{username}]
+    })
+    if (existedUsername){
+        throw new ApiError(402,"User with the same username already exists")
     }
 
     // Create new user in the database
