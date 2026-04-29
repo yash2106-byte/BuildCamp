@@ -1,7 +1,7 @@
 import { body } from "express-validator"
 
 // over here we'll take each parameter coming from the frontend and then eventually check them using inbuilt functions
-const userRegisterValidator = () => {
+export const userRegisterValidator = () => {
     return [
         body("email")
             .trim()
