@@ -1,12 +1,15 @@
 import express from 'express'
 import cors from 'cors'
+// Express is not capable to talk with the cookies hence we have to get a "cookie-parser"
+import cookieParser from "cookie-parser"
+
 const web = express()
 
 // these are the bare minimum configurations
 web.use(express.json({limit: "16kb"}))
 web.use(express.urlencoded({extended: true,limits:"16kb"}))
 web.use(express.static('public'))
-
+app.use(cookieParser())// this helps express to directly talk with cookies
 // cors configurations
 web.use(cors({
     origin: process.env.CORSORIGIN?.split(",")|| "http://localhost:5172",
