@@ -80,25 +80,34 @@ const RegisterUser = asyncHandler(async (req,res)=>{
             ))
 })
 
+// We'll be adding the login controller here only rather then having a different fie
+
+// Login function is performed in levels
 const loginfunction = asyncHandler(async(req,res)=>{
+
+    // take data from user
     const {Gmail,Password} = req.body
     if (!Gmail){
         // return res.status(400).json({Error:"Gmail is not available"})
         throw new ApiError(400,"Gmail has not reached the server") // this is how we should use the ApiError function
     }
 
+    // Validate if the details is correct or not 
     const user = await User.findOne({Gmail})
     if (!user){
         throw new ApiError(400,"The gmail given is not registered")
     }
 
+    // Check if the password is valid or not
     const isPasswordvalid = await user.isPasswordCorrect(Password)
     if (!isPasswordvalid){
         throw new ApiError(400,"Password is incorrect")
     }
 
+    // Generate Tokens
     const { accessToken,refershToken }= await GenerateAllTokens(user._id)
 
+    // Tell database that the user has logged in
     const loggedUser = await User
         .findById(user._id)
         .select("-password -refershToken -emailVerficationToken -emailVerficationExpiry")
@@ -106,11 +115,11 @@ const loginfunction = asyncHandler(async(req,res)=>{
         throw new ApiError(500 , "Something went wrong while registering user")
     }
 
+    // Send tokens in the cookies
     const option = {
         httpOnly:true,
         secure:true
     }
-
     return res
         .status(200)
         .cookie("accessToken",accessToken,option)
