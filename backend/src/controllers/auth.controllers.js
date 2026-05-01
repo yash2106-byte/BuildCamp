@@ -5,15 +5,17 @@ import {ApiError} from "../utils/api-error.js"
 import { emailVerificationMailgenContent, sendEmail } from "../utils/mail.js"
 
 // the first thing we'll need is token, hence we are genrating it first
+// make sure that the name of the tokens are same everywhere even extra spaces cause error
 const GenerateAllTokens = async (userId) =>{
     try {
         const Newuser = await User.findById(userId)
-        const AccessToken = Newuser.GenerateAcces();
-        const RefreshToken = Newuser.GenerateRefresh()
+        const accessToken = Newuser.GenerateAcces();
+        const refreshToken = Newuser.GenerateRefresh()
 
-        Newuser.refershToken = RefreshToken
-        await Newuser.save({validateBeforeSave: false})
-        return {AccessToken,RefreshToken}
+        Newuser.refershToken = refreshToken
+        await Newuser.save({ validateBeforeSave: false })
+
+        return { accessToken, refreshToken } 
 
     } catch (error) {
         throw new ApiError(500,"Something went wrong while generating tokens")
@@ -108,7 +110,7 @@ const loginfunction = asyncHandler(async(req,res)=>{
     }
 
     // Generate Tokens
-    const { accessToken,refershToken }= await GenerateAllTokens(user._id)
+    const { accessToken,refreshToken  }= await GenerateAllTokens(user._id)
 
     // Tell database that the user has logged in
     const loggedUser = await User
@@ -125,16 +127,12 @@ const loginfunction = asyncHandler(async(req,res)=>{
     }
     return res
         .status(200)
-        .cookie("accessToken",accessToken,option)
-        .cookie("refereshToken",refershToken,option)
+        .cookie("accessToken", accessToken, option)
+        .cookie("refreshToken", refreshToken , option) 
         .json(
             new ApiResponse(200,
-                {
-                    user: loggedUser,
-                    accessToken,
-                    refershToken
-                },
-                "User logged in succesfully"
+                { user: loggedUser, accessToken, refreshToken },
+                "User logged in successfully"
             )
         )
 
