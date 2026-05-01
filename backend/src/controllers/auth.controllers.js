@@ -86,20 +86,23 @@ const RegisterUser = asyncHandler(async (req,res)=>{
 const loginfunction = asyncHandler(async(req,res)=>{
 
     // take data from user
-    const {Gmail,Password} = req.body
-    if (!Gmail){
+    const {email,password} = req.body
+    // console.log(email);
+    if (!email){
+        
+        
         // return res.status(400).json({Error:"Gmail is not available"})
         throw new ApiError(400,"Gmail has not reached the server") // this is how we should use the ApiError function
     }
 
     // Validate if the details is correct or not 
-    const user = await User.findOne({Gmail})
+    const user = await User.findOne({email})
     if (!user){
         throw new ApiError(400,"The gmail given is not registered")
     }
 
     // Check if the password is valid or not
-    const isPasswordvalid = await user.isPasswordCorrect(Password)
+    const isPasswordvalid = await user.isPasswordCorrect(password)
     if (!isPasswordvalid){
         throw new ApiError(400,"Password is incorrect")
     }
@@ -111,7 +114,7 @@ const loginfunction = asyncHandler(async(req,res)=>{
     const loggedUser = await User
         .findById(user._id)
         .select("-password -refershToken -emailVerficationToken -emailVerficationExpiry")
-    if (!createdUser){
+    if (!loggedUser){
         throw new ApiError(500 , "Something went wrong while registering user")
     }
 

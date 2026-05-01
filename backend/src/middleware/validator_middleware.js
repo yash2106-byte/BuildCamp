@@ -11,7 +11,7 @@ export const validate = (req,res,next)=>{
     }
     // if there are some errors then we are converting it into an array so that we can loop through it once we have made the array then we'll push with error path and error message in a pair
     const extractedError = []
-    error.array().mpp((err)=> extractedError.push(
+    error.array().map((err)=> extractedError.push(
         {
             [err.path]:err.msg
         }));
