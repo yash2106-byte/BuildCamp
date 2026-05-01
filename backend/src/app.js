@@ -9,7 +9,7 @@ const web = express()
 web.use(express.json({limit: "16kb"}))
 web.use(express.urlencoded({extended: true,limits:"16kb"}))
 web.use(express.static('public'))
-app.use(cookieParser())// this helps express to directly talk with cookies
+web.use(cookieParser())// this helps express to directly talk with cookies
 // cors configurations
 web.use(cors({
     origin: process.env.CORSORIGIN?.split(",")|| "http://localhost:5172",
