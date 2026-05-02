@@ -138,4 +138,8 @@ const loginfunction = asyncHandler(async(req,res)=>{
 
 })
 
-export {RegisterUser,loginfunction}
+
+const logoutfunction = asyncHandler(async(req,res)=>{
+
+})
+export {RegisterUser,loginfunction,logoutfunction}
