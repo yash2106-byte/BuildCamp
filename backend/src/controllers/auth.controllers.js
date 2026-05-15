@@ -45,7 +45,7 @@ const RegisterUser = asyncHandler(async (req,res)=>{
         email,
         password,
         username,
-        isEmailVerified: false
+        isEmail: false
     })
     const{unhashed,hashed,tokenExpiry} = Newuser.GenerateTemp()
     Newuser.emailVerficationToken = hashed
@@ -162,4 +162,89 @@ const logoutUser = asyncHandler(async(req,res)=>{
         .json(new ApiResponse(200,{},"user Logged out"));
 })
 
-export {RegisterUser,loginfunction,logoutUser}
+const currentUser = asyncHandler(async(req,res)=>{
+    return res 
+        .status(200)
+        .json(
+            new ApiResponse(200,req.user,"current user details fetched")
+        )
+})
+
+
+const verfiyEmail = asyncHandler(async(req,res)=>{
+    const {verificationToken}= req.params
+    if (!verificationToken){
+        throw new ApiError(400,"email verification token is missing")
+    }
+    // to check that the user is the verified user we will first fetch our token from the url and then we will create another hashed token which will be used to get the details from the db
+    let hashedToken = crypto
+        .createHash("sha256")
+        .update(verificationToken)
+        .digest("hex")
+        // if we have a user with the same hashed token and with the valid expiry time
+        const user = await User.findOne({
+            emailVerficationToken:hashedToken,
+            emailVerficationExpiry:{$gt: Date.now()}
+        })
+
+    if (!user){
+        throw new ApiError(400, "Token is invalid or expired")
+    }
+
+    user.emailVerficationToken = undefined
+    user.emailVerficationExpiry = undefined
+
+    user.isEmail = true
+    await user.save({validateBeforeSave: false})
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {isEmail:true},
+                "email is verified",
+            )
+        )
+})
+
+
+const resendEmail = asyncHandler(async (req,res)=>{
+
+    const user = await User.findById(req.user?._id)
+
+    if(!user){
+        throw new ApiError(404,"user does not exsit")
+    }
+
+    if(user.isEmail){
+        throw new ApiError(409,"Email is already verified")
+    }
+
+    const{unhashed,hashed,tokenExpiry} = Newuser.GenerateTemp()
+    Newuser.emailVerficationToken = hashed
+    Newuser.emailVerficationExpiry = tokenExpiry
+    await Newuser.save({validateBeforeSave: false})
+
+
+    // After creating the user then we'll send the email for validation
+    await sendEmail({
+        email:Newuser?.email,
+        subject: "Plese verfiy your email",
+        mailgenContent: emailVerificationMailgenContent(
+            Newuser.username,
+            // this is the link which will be passed 
+            `${req.protocol}://${req.get("host")}//api/v1/users/verify-email/${unhashed}`
+        )
+    })
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                "Email has been send again",
+            )
+        )
+
+})
+export {RegisterUser,loginfunction,logoutUser,currentUser,verfiyEmail,resendEmail}
