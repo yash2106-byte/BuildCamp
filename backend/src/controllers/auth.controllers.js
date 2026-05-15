@@ -144,7 +144,7 @@ const logoutUser = asyncHandler(async(req,res)=>{
         req.user._id,
         {
             $set: {
-                refreshToken: ""
+                refershToken: ""
             }
         },
         {
@@ -158,7 +158,7 @@ const logoutUser = asyncHandler(async(req,res)=>{
     return res 
         .status(200)
         .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
+        .clearCookie("refershToken", options)
         .json(new ApiResponse(200,{},"user Logged out"));
 })
 

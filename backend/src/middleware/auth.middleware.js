@@ -4,7 +4,7 @@
 import { User } from "../models/users_models.js";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
-
+import jwt from "jsonwebtoken"
 
 export const verifyJWT = asyncHandler(async(req,res,next)=>{
     const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","")
@@ -14,16 +14,23 @@ export const verifyJWT = asyncHandler(async(req,res,next)=>{
     }
 
     try{
-        const decodedToken = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
+        const decodedToken = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)// this takes token and my jwt key and then it checks multiple things
         const user = await User.findById(decodedToken?._id).select("-password -refershToken -emailVerficationToken -emailVerficationExpiry")
 
         if (!user){
-            throw new ApiError(401,"Invalid token")
+            throw new ApiError(401,"Invalid token") // if we were sending an api error with this then it would get caught on the catch block
         }
         req.user = user
         next()
     }
     catch(error){
-        throw new ApiError(401,"Invalid Acces token")
+        // without this the catch block would just eat the real error and print this genric message
+        if (error instanceof ApiError) {
+            // "Is this error already an ApiError WE created?"
+            // YES → just re-throw it as-is, don't touch it
+            // NO  → it's a JWT library error, wrap it in ApiError and throw
+        throw error;
+    }
+        throw new ApiError(401,"Invalid Acces tokennnn")
     }
 })
