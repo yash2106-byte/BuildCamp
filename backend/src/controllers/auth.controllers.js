@@ -247,4 +247,5 @@ const resendEmail = asyncHandler(async (req,res)=>{
         )
 
 })
+
 export {RegisterUser,loginfunction,logoutUser,currentUser,verfiyEmail,resendEmail}
